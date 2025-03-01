@@ -86,19 +86,20 @@ static std::string RCTStringFromNSString(NSString *string) {
             
             // Apply transform to new text portion
             NSRange newTextRange = NSMakeRange(oldText.length, newText.length - oldText.length);
-            [attributedText addAttribute:NSBaselineOffsetAttributeName 
-                                 value:@(20) // Start 20 points below
-                                 range:newTextRange];
+            CGAffineTransform transform = CGAffineTransformMakeTranslation(0, 20); // Start 20 points below
+            [attributedText addAttribute:NSCTTransformAttributeName 
+                                value:[NSValue valueWithCGAffineTransform:transform]
+                                range:newTextRange];
             
             _textView.attributedText = attributedText;
             [self applyMarkdownStyling];
             
-            // Animate the baseline offset back to 0
+            // Animate the transform back to identity
             [UIView animateWithDuration:0.3 animations:^{
                 NSMutableAttributedString *finalText = [[NSMutableAttributedString alloc] initWithAttributedString:self->_textView.attributedText];
-                [finalText addAttribute:NSBaselineOffsetAttributeName 
-                                value:@(0) 
-                                range:newTextRange];
+                [finalText addAttribute:NSCTTransformAttributeName 
+                               value:[NSValue valueWithCGAffineTransform:CGAffineTransformIdentity]
+                               range:newTextRange];
                 self->_textView.attributedText = finalText;
             }];
         } else {
