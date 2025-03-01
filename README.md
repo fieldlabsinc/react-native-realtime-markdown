@@ -15,3 +15,16 @@ import { RealtimeMarkdown } from "react-native-realtime-markdown";
 
 <RealtimeMarkdown># Hello, world!</RealtimeMarkdown>;
 ```
+
+Also add this to AppDelegate.mm
+
+```
+#import "RealtimeMarkdownView.h"
+
+- (NSDictionary<NSString *,Class<RCTComponentViewProtocol>> *)thirdPartyFabricComponents
+{
+  NSMutableDictionary * dictionary = [super thirdPartyFabricComponents].mutableCopy;
+  dictionary[@"RealtimeMarkdownView"] = [RealtimeMarkdownView class];
+  return dictionary;
+}
+```
