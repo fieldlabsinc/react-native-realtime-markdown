@@ -77,8 +77,42 @@ static std::string RCTStringFromNSString(NSString *string) {
     const auto &newViewProps = *std::static_pointer_cast<RealtimeMarkdownViewProps const>(props);
 
     if (oldViewProps.text != newViewProps.text) {
-        _textView.text = RCTNSStringFromString(newViewProps.text);
-        [self applyMarkdownStyling];
+        NSString *newText = RCTNSStringFromString(newViewProps.text);
+        NSString *oldText = _textView.text;
+        
+        // Only animate if new text is longer (text was added)
+        if (newText.length > oldText.length) {
+            // Create temporary text view for animation
+            UITextView *tempTextView = [[UITextView alloc] initWithFrame:_textView.frame];
+            tempTextView.text = [newText substringFromIndex:oldText.length];
+            tempTextView.font = _textView.font;
+            tempTextView.backgroundColor = [UIColor clearColor];
+            tempTextView.textContainer.lineFragmentPadding = 0;
+            tempTextView.textContainerInset = _textView.textContainerInset;
+            
+            // Position below current text
+            CGFloat yOffset = 20;
+            tempTextView.transform = CGAffineTransformMakeTranslation(0, yOffset);
+            tempTextView.alpha = 0;
+            
+            [self addSubview:tempTextView];
+            
+            // Update main text view
+            _textView.text = newText;
+            [self applyMarkdownStyling];
+            
+            // Animate new text sliding up
+            [UIView animateWithDuration:0.3 animations:^{
+                tempTextView.transform = CGAffineTransformIdentity;
+                tempTextView.alpha = 1;
+            } completion:^(BOOL finished) {
+                [tempTextView removeFromSuperview];
+            }];
+        } else {
+            // If text was removed or replaced, update without animation
+            _textView.text = newText;
+            [self applyMarkdownStyling];
+        }
     }
 
     if (oldViewProps.fontFamily != newViewProps.fontFamily) {
