@@ -82,31 +82,24 @@ static std::string RCTStringFromNSString(NSString *string) {
         
         // Only animate if new text is longer (text was added)
         if (newText.length > oldText.length) {
-            // Create temporary text view for animation
-            UITextView *tempTextView = [[UITextView alloc] initWithFrame:_textView.frame];
-            tempTextView.text = [newText substringFromIndex:oldText.length];
-            tempTextView.font = _textView.font;
-            tempTextView.backgroundColor = [UIColor clearColor];
-            tempTextView.textContainer.lineFragmentPadding = 0;
-            tempTextView.textContainerInset = _textView.textContainerInset;
+            NSMutableAttributedString *attributedText = [[NSMutableAttributedString alloc] initWithString:newText];
             
-            // Position below current text
-            CGFloat yOffset = 20;
-            tempTextView.transform = CGAffineTransformMakeTranslation(0, yOffset);
-            tempTextView.alpha = 0;
+            // Apply transform to new text portion
+            NSRange newTextRange = NSMakeRange(oldText.length, newText.length - oldText.length);
+            [attributedText addAttribute:NSBaselineOffsetAttributeName 
+                                 value:@(20) // Start 20 points below
+                                 range:newTextRange];
             
-            [self addSubview:tempTextView];
-            
-            // Update main text view
-            _textView.text = newText;
+            _textView.attributedText = attributedText;
             [self applyMarkdownStyling];
             
-            // Animate new text sliding up
+            // Animate the baseline offset back to 0
             [UIView animateWithDuration:0.3 animations:^{
-                tempTextView.transform = CGAffineTransformIdentity;
-                tempTextView.alpha = 1;
-            } completion:^(BOOL finished) {
-                [tempTextView removeFromSuperview];
+                NSMutableAttributedString *finalText = [[NSMutableAttributedString alloc] initWithAttributedString:self->_textView.attributedText];
+                [finalText addAttribute:NSBaselineOffsetAttributeName 
+                                value:@(0) 
+                                range:newTextRange];
+                self->_textView.attributedText = finalText;
             }];
         } else {
             // If text was removed or replaced, update without animation
