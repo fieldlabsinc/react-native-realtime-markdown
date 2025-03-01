@@ -1,4 +1,5 @@
 #import "RealtimeMarkdownView.h"
+#import <CoreText/CoreText.h>
 
 #import "react/renderer/components/RNRealtimeMarkdownSpec/ComponentDescriptors.h"
 #import "react/renderer/components/RNRealtimeMarkdownSpec/EventEmitters.h"
@@ -87,7 +88,7 @@ static std::string RCTStringFromNSString(NSString *string) {
             // Apply transform to new text portion
             NSRange newTextRange = NSMakeRange(oldText.length, newText.length - oldText.length);
             CGAffineTransform transform = CGAffineTransformMakeTranslation(0, 20); // Start 20 points below
-            [attributedText addAttribute:NSCTTransformAttributeName 
+            [attributedText addAttribute:(NSString *)kCTTransformAttributeName 
                                 value:[NSValue valueWithCGAffineTransform:transform]
                                 range:newTextRange];
             
@@ -97,7 +98,7 @@ static std::string RCTStringFromNSString(NSString *string) {
             // Animate the transform back to identity
             [UIView animateWithDuration:0.3 animations:^{
                 NSMutableAttributedString *finalText = [[NSMutableAttributedString alloc] initWithAttributedString:self->_textView.attributedText];
-                [finalText addAttribute:NSCTTransformAttributeName 
+                [finalText addAttribute:(NSString *)kCTTransformAttributeName 
                                value:[NSValue valueWithCGAffineTransform:CGAffineTransformIdentity]
                                range:newTextRange];
                 self->_textView.attributedText = finalText;
