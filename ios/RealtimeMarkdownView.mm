@@ -1,5 +1,4 @@
 #import "RealtimeMarkdownView.h"
-#import <CoreText/CoreText.h>
 
 #import "react/renderer/components/RNRealtimeMarkdownSpec/ComponentDescriptors.h"
 #import "react/renderer/components/RNRealtimeMarkdownSpec/EventEmitters.h"
@@ -79,35 +78,9 @@ static std::string RCTStringFromNSString(NSString *string) {
 
     if (oldViewProps.text != newViewProps.text) {
         NSString *newText = RCTNSStringFromString(newViewProps.text);
-        NSString *oldText = _textView.text;
         
-        // Only animate if new text is longer (text was added)
-        if (newText.length > oldText.length) {
-            NSMutableAttributedString *attributedText = [[NSMutableAttributedString alloc] initWithString:newText];
-            
-            // Apply transform to new text portion
-            NSRange newTextRange = NSMakeRange(oldText.length, newText.length - oldText.length);
-            CGAffineTransform transform = CGAffineTransformMakeTranslation(0, 20); // Start 20 points below
-            [attributedText addAttribute:(NSString *)kCTTransformAttributeName 
-                                value:[NSValue valueWithCGAffineTransform:transform]
-                                range:newTextRange];
-            
-            _textView.attributedText = attributedText;
-            [self applyMarkdownStyling];
-            
-            // Animate the transform back to identity
-            [UIView animateWithDuration:0.3 animations:^{
-                NSMutableAttributedString *finalText = [[NSMutableAttributedString alloc] initWithAttributedString:self->_textView.attributedText];
-                [finalText addAttribute:(NSString *)kCTTransformAttributeName 
-                               value:[NSValue valueWithCGAffineTransform:CGAffineTransformIdentity]
-                               range:newTextRange];
-                self->_textView.attributedText = finalText;
-            }];
-        } else {
-            // If text was removed or replaced, update without animation
-            _textView.text = newText;
-            [self applyMarkdownStyling];
-        }
+        _textView.text = newText;
+        [self applyMarkdownStyling];
     }
 
     if (oldViewProps.fontFamily != newViewProps.fontFamily) {
@@ -121,7 +94,7 @@ static std::string RCTStringFromNSString(NSString *string) {
 - (void)updateEventEmitter:(facebook::react::SharedEventEmitter)eventEmitter
 {
     [super updateEventEmitter:eventEmitter];
-    
+              
     // Check if we need to send initial size notification
     if (_needsInitialSizeNotification && eventEmitter) {
         _needsInitialSizeNotification = NO;
