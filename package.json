@@ -1,6 +1,6 @@
 {
   "name": "react-native-realtime-markdown",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Better styling and formatting for editable text",
   "main": "src/index",
   "codegenConfig": {
