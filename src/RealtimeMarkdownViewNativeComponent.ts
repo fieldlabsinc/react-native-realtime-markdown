@@ -10,6 +10,7 @@ interface NativeProps extends ViewProps {
   text?: string;
   editable?: boolean;
   fontFamily?: string;
+  disabled?: boolean;
 
   onContentSizeChange?: DirectEventHandler<{
     height: Double;
