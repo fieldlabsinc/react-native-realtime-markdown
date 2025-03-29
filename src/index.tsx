@@ -19,7 +19,12 @@ export function RealtimeMarkdown({
   disabled,
   ...props
 }: RealtimeMarkdownProps) {
-  const [height, setHeight] = React.useState<number | undefined>(undefined);
+  // This 500px height is a hack, monkey patch to fix that long text wouldn't cause layout shifts when the text is long and onContentSizeChange did not come from the native side yet.
+  const [height, setHeight] = React.useState<number | undefined>(
+    React.Children.toArray(children).join("").split("\n").length > 8
+      ? 500
+      : undefined
+  );
   const initialTextRef = React.useRef(
     React.Children.toArray(children).join("")
   );
@@ -30,14 +35,6 @@ export function RealtimeMarkdown({
       initialTextRef.current = React.Children.toArray(children).join("");
     }
   }, [children, disabled]);
-
-  // This is a hack, monkey patch to fix that long text wouldn't cause layout shifts when the text is long and onContentSizeChange did not come from the native side yet.
-  useEffect(() => {
-    const lineCount = initialTextRef.current.split("\n").length;
-    if (lineCount > 8) {
-      setHeight(500);
-    }
-  }, []);
 
   return (
     <RealtimeMarkdownViewNative
