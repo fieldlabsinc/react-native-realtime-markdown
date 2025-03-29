@@ -47,6 +47,12 @@ class RealtimeMarkdownViewManager : SimpleViewManager<RealtimeMarkdownView>(),
     // For now this is a stub implementation
   }
 
+  @ReactProp(name = "disabled")
+  override fun setDisabled(view: RealtimeMarkdownView?, value: Boolean) {
+    // Implement editable setting logic here
+    // For now this is a stub implementation
+  }
+
   @ReactProp(name = "fontFamily")
   override fun setFontFamily(view: RealtimeMarkdownView?, value: String?) {
     // Implement font family setting logic here
